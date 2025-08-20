@@ -3,7 +3,7 @@ using SmartlyAssignment.Core.Domain.Enums;
 
 namespace SmartlyAssignment.Core.Domain.Services;
 
-public class PayslipCalculator
+public class PayslipCalculator : IPayslipCalculator
 {
     private readonly ITaxBracketService _taxBracketService;
 
