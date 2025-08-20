@@ -5,18 +5,58 @@ namespace SmartlyAssignment.Core.Domain.Services;
 
 public class PayslipCalculator
 {
+    private readonly ITaxBracketService _taxBracketService;
+
+    public PayslipCalculator(ITaxBracketService taxBracketService)
+    {
+        _taxBracketService = taxBracketService ?? throw new ArgumentNullException(nameof(taxBracketService));
+    }
+
     public Payslip CalculatePayslip(Employee employee, Month month, int year)
     {
-        // TODO: Implement actual calculation logic
-        // For now, return a stub to make tests fail as expected
+        var grossMonthlyIncome = employee.AnnualSalary / 12m;
+        
+        var annualTaxedIncome = CalculateTaxedIncome(employee.AnnualSalary);
+        var monthlyTaxedIncome = annualTaxedIncome / 12m;
+        
+        var netIncome = grossMonthlyIncome - monthlyTaxedIncome;
+        
+        var super = grossMonthlyIncome * employee.SuperRate;
+
         return new Payslip(
             employee.FullName,
             month,
             year,
-            0, // Gross income
-            0, // Income tax
-            0, // Net income
-            0  // Super
+            grossMonthlyIncome,
+            monthlyTaxedIncome,
+            netIncome,
+            super
         );
+    }
+
+    private decimal CalculateTaxedIncome(decimal annualSalary)
+    {
+        var taxBrackets = _taxBracketService.GetOrderedTaxBrackets();
+        var totalTax = 0m;
+        var remainingUntaxedIncome = annualSalary;
+        
+        foreach (var bracket in taxBrackets)
+        {
+            if (remainingUntaxedIncome <= 0)
+            {
+                break;
+            }
+                
+            var taxableInThisBracket = Math.Min(
+                remainingUntaxedIncome, 
+                bracket.UpperBound - bracket.LowerBound
+            );
+            
+            totalTax += taxableInThisBracket * bracket.Rate;
+            
+            remainingUntaxedIncome -= taxableInThisBracket;
+        }
+        
+        return totalTax;
     }
 }

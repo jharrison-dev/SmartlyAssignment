@@ -5,13 +5,13 @@ namespace SmartlyAssignment.Core.Domain.Entities;
 
 public class Payslip
 {
-    public string EmployeeName { get; }
-    public Month Month { get; }
-    public int Year { get; }
-    public decimal GrossIncome { get; }
-    public decimal IncomeTax { get; }
-    public decimal NetIncome { get; }
-    public decimal Super { get; }
+    private readonly string _employeeName;
+    private readonly Month _month;
+    private readonly int _year;
+    private readonly decimal _grossIncome;
+    private readonly decimal _incomeTax;
+    private readonly decimal _netIncome;
+    private readonly decimal _super;
 
     public Payslip(string employeeName, Month month, int year, decimal grossIncome, decimal incomeTax, decimal netIncome, decimal super)
     {
@@ -45,25 +45,25 @@ public class Payslip
             throw new ArgumentException("Super cannot be negative", nameof(super));
         }
 
-        EmployeeName = employeeName;
-        Month = month;
-        Year = year;
-        GrossIncome = grossIncome;
-        IncomeTax = incomeTax;
-        NetIncome = netIncome;
-        Super = super;
+        _employeeName = employeeName;
+        _month = month;
+        _year = year;
+        _grossIncome = grossIncome;
+        _incomeTax = incomeTax;
+        _netIncome = netIncome;
+        _super = super;
     }
 
     private string CalculatePayPeriod()
     {
-        var firstDayOfMonth = new DateTime(Year, (int)Month, 1);
+        var firstDayOfMonth = new DateTime(_year, (int)_month, 1);
         var lastDayOfMonth = firstDayOfMonth.AddMonths(1).AddDays(-1);
 
         return $"{firstDayOfMonth:dd MMMM} – {lastDayOfMonth:dd MMMM}";
     }
 
-    public string ToCsvFormat()
+    public string ToCsvFormat(int decimalPlaces = 2)
     {
-        return $"{EmployeeName},{CalculatePayPeriod()},{GrossIncome:F2},{IncomeTax:F2},{NetIncome:F2},{Super:F2}";
+        return $"{_employeeName},{CalculatePayPeriod()},{_grossIncome.ToString($"F{decimalPlaces}")},{_incomeTax.ToString($"F{decimalPlaces}")},{_netIncome.ToString($"F{decimalPlaces}")},{_super.ToString($"F{decimalPlaces}")}";
     }
 }

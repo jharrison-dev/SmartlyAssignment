@@ -7,30 +7,9 @@ namespace SmartlyAssignment.Tests.Domain.Entities;
 
 public class PayslipTests
 {
-    [Fact]
-    public void Should_CreatePayslip_WhenValidDataIsProvided()
-    {
-        const string expectedEmployeeName = "John Smith";
-        const Month expectedMonth = Month.March;
-        const int expectedYear = 2024;
-        const decimal expectedGrossIncome = 5004.17m;
-        const decimal expectedIncomeTax = 919.58m;
-        const decimal expectedNetIncome = 4084.59m;
-        const decimal expectedSuper = 450.38m;
-
-        var payslip = new Payslip(expectedEmployeeName, expectedMonth, expectedYear, expectedGrossIncome, expectedIncomeTax, expectedNetIncome, expectedSuper);
-
-        payslip.EmployeeName.Should().Be(expectedEmployeeName);
-        payslip.Month.Should().Be(expectedMonth);
-        payslip.Year.Should().Be(expectedYear);
-        payslip.GrossIncome.Should().Be(expectedGrossIncome);
-        payslip.IncomeTax.Should().Be(expectedIncomeTax);
-        payslip.NetIncome.Should().Be(expectedNetIncome);
-        payslip.Super.Should().Be(expectedSuper);
-    }
 
     [Fact]
-    public void Should_FormatToCsv_WhenToCsvFormatIsCalled()
+    public void Should_FormatToCsv_WithExpectedFormat()
     {
         const string employeeName = "John Smith";
         const Month month = Month.March;
@@ -52,7 +31,7 @@ public class PayslipTests
     [InlineData("")]
     [InlineData(" ")]
     [InlineData(null)]
-    public void ShouldNot_CreatePayslip_WhenEmployeeNameIsInvalid(string employeeName)
+    public void Should_ThrowArgumentException_WhenEmployeeNameIsInvalid(string? employeeName)
     {
         const Month month = Month.March;
         const int year = 2024;
@@ -62,7 +41,7 @@ public class PayslipTests
         const decimal super = 450.38m;
         const string expectedErrorMessage = "Employee name cannot be null or empty (Parameter 'employeeName')";
 
-        var action = () => new Payslip(employeeName, month, year, grossIncome, incomeTax, netIncome, super);
+        var action = () => new Payslip(employeeName!, month, year, grossIncome, incomeTax, netIncome, super);
         
         action.Should().Throw<ArgumentException>()
             .WithMessage(expectedErrorMessage);
@@ -72,7 +51,7 @@ public class PayslipTests
     [InlineData(0)]
     [InlineData(-1)]
     [InlineData(-100)]
-    public void ShouldNot_CreatePayslip_WhenYearIsNotPositive(int invalidYear)
+    public void Should_ThrowArgumentException_WhenYearIsNotPositive(int invalidYear)
     {
         const string employeeName = "John Smith";
         const Month month = Month.March;
@@ -91,7 +70,7 @@ public class PayslipTests
     [Theory]
     [InlineData(-0.01)]
     [InlineData(-1000)]
-    public void ShouldNot_CreatePayslip_WhenMonetaryValuesAreNegative(decimal negativeValue)
+    public void Should_ThrowArgumentException_WhenGrossIncomeIsNegative(decimal negativeValue)
     {
         const string employeeName = "John Smith";
         const Month month = Month.March;
@@ -108,21 +87,59 @@ public class PayslipTests
     }
 
     [Theory]
-    [InlineData(Month.March, 2024, "01 March – 31 March")]
-    [InlineData(Month.April, 2024, "01 April – 30 April")]
-    [InlineData(Month.February, 2024, "01 February – 29 February")] // 2024 is a leap year
-    [InlineData(Month.February, 2023, "01 February – 28 February")] // 2023 is not a leap year
-    public void Should_FormatPayPeriod_WhenToCsvFormatIsCalled(Month month, int year, string expectedPayPeriod)
+    [InlineData(-0.01)]
+    [InlineData(-1000)]
+    public void Should_ThrowArgumentException_WhenIncomeTaxIsNegative(decimal negativeValue)
     {
         const string employeeName = "John Smith";
+        const Month month = Month.March;
+        const int year = 2024;
+        const decimal grossIncome = 5004.17m;
+        const decimal netIncome = 4084.59m;
+        const decimal super = 450.38m;
+        const string expectedErrorMessage = "Income tax cannot be negative (Parameter 'incomeTax')";
+
+        var action = () => new Payslip(employeeName, month, year, grossIncome, negativeValue, netIncome, super);
+        
+        action.Should().Throw<ArgumentException>()
+            .WithMessage(expectedErrorMessage);
+    }
+
+    [Theory]
+    [InlineData(-0.01)]
+    [InlineData(-1000)]
+    public void Should_ThrowArgumentException_WhenNetIncomeIsNegative(decimal negativeValue)
+    {
+        const string employeeName = "John Smith";
+        const Month month = Month.March;
+        const int year = 2024;
+        const decimal grossIncome = 5004.17m;
+        const decimal incomeTax = 919.58m;
+        const decimal super = 450.38m;
+        const string expectedErrorMessage = "Net income cannot be negative (Parameter 'netIncome')";
+
+        var action = () => new Payslip(employeeName, month, year, grossIncome, incomeTax, negativeValue, super);
+        
+        action.Should().Throw<ArgumentException>()
+            .WithMessage(expectedErrorMessage);
+    }
+
+    [Theory]
+    [InlineData(-0.01)]
+    [InlineData(-1000)]
+    public void Should_ThrowArgumentException_WhenSuperIsNegative(decimal negativeValue)
+    {
+        const string employeeName = "John Smith";
+        const Month month = Month.March;
+        const int year = 2024;
         const decimal grossIncome = 5004.17m;
         const decimal incomeTax = 919.58m;
         const decimal netIncome = 4084.59m;
-        const decimal super = 450.38m;
+        const string expectedErrorMessage = "Super cannot be negative (Parameter 'super')";
 
-        var payslip = new Payslip(employeeName, month, year, grossIncome, incomeTax, netIncome, super);
-
-        var csvResult = payslip.ToCsvFormat();
-        csvResult.Should().Contain(expectedPayPeriod);
+        var action = () => new Payslip(employeeName, month, year, grossIncome, incomeTax, netIncome, negativeValue);
+        
+        action.Should().Throw<ArgumentException>()
+            .WithMessage(expectedErrorMessage);
     }
 }

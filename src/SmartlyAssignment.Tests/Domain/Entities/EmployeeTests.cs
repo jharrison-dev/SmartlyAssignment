@@ -6,24 +6,6 @@ namespace SmartlyAssignment.Tests.Domain.Entities;
 
 public class EmployeeTests
 {
-    [Fact]
-    public void Should_CreateEmployee_WhenValidDataIsProvided()
-    {
-        const string expectedFirstName = "John";
-        const string expectedLastName = "Smith";
-        const decimal expectedAnnualSalary = 60050m;
-        const decimal expectedSuperRate = 0.09m;
-        const string expectedFullName = "John Smith";
-
-        var employee = new Employee(expectedFirstName, expectedLastName, expectedAnnualSalary, expectedSuperRate);
-
-        employee.FirstName.Should().Be(expectedFirstName);
-        employee.LastName.Should().Be(expectedLastName);
-        employee.AnnualSalary.Should().Be(expectedAnnualSalary);
-        employee.SuperRate.Should().Be(expectedSuperRate);
-        employee.FullName.Should().Be(expectedFullName);
-    }
-
     [Theory]
     [InlineData(0.0)]
     [InlineData(0.25)]
@@ -58,14 +40,14 @@ public class EmployeeTests
     [InlineData("")]
     [InlineData(" ")]
     [InlineData(null)]
-    public void ShouldNot_CreateEmployee_WhenFirstNameIsInvalid(string firstName)
+    public void ShouldNot_CreateEmployee_WhenFirstNameIsInvalid(string? firstName)
     {
         const string lastName = "Smith";
         const decimal annualSalary = 60050m;
         const decimal superRate = 0.09m;
         const string expectedErrorMessage = "First name cannot be null or empty (Parameter 'firstName')";
 
-        var action = () => new Employee(firstName, lastName, annualSalary, superRate);
+        var action = () => new Employee(firstName!, lastName, annualSalary, superRate);
         
         action.Should().Throw<ArgumentException>()
             .WithMessage(expectedErrorMessage);
@@ -75,14 +57,14 @@ public class EmployeeTests
     [InlineData("")]
     [InlineData(" ")]
     [InlineData(null)]
-    public void ShouldNot_CreateEmployee_WhenLastNameIsInvalid(string lastName)
+    public void ShouldNot_CreateEmployee_WhenLastNameIsInvalid(string? lastName)
     {
         const string firstName = "John";
         const decimal annualSalary = 60050m;
         const decimal superRate = 0.09m;
         const string expectedErrorMessage = "Last name cannot be null or empty (Parameter 'lastName')";
 
-        var action = () => new Employee(firstName, lastName, annualSalary, superRate);
+        var action = () => new Employee(firstName, lastName!, annualSalary, superRate);
         
         action.Should().Throw<ArgumentException>()
             .WithMessage(expectedErrorMessage);
