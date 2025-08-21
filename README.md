@@ -4,32 +4,38 @@
 
 - **SmartlyAssignment.Core** - Core business logic and domain services
 - **SmartlyAssignment.Tests** - Unit tests using xUnit
+- **SmartlyAssignment.Api** - ASP.NET Core Web API with frontend
 
-## Prerequisites
+## Getting Started
 
-- .NET 8.0 SDK or later
-
-## Building the Solution
-
-Navigate to the `src` directory and run:
+### Option 1: From Terminal
 
 ```bash
-# Navigate to source directory
+# Navigate to the API project directory
+cd src/SmartlyAssignment.Api
+
+# Build and run the API
+dotnet run
+```
+
+### Option 2: Run Tests
+
+```bash
+# Navigate to the source directory
 cd src
 
-# Restore packages
-dotnet restore
-
-# Build solution
-dotnet build
-
-# Run tests
+# Run all tests
 dotnet test
 ```
 
-## Current Status
+### Option 3: From Visual Studio
 
-The project currently contains a stub `PayslipCalculator` service that returns `1` for testing purposes. Unit tests verify this basic functionality works correctly.
+1. Open the solution in Visual Studio
+2. Right-click on `SmartlyAssignment.Api` project
+3. Select "Set as Startup Project"
+4. Press F5 or click the "Start Debugging" button
+
+The API will start on `http://localhost:5140` in Development mode with the frontend interface accessible at the same URL.
 
 ## 🔧 Assumptions
 
@@ -41,9 +47,6 @@ The system accepts a month name and year, then calculates the full calendar mont
 ### Percentage Storage
 Super rates are stored as `decimal` values representing fractions (e.g., 0.09 for 9%, 0.10 for 10%). This approach follows financial industry standards for precision and avoids floating-point arithmetic errors.
 
-## Next Steps
+## Frontend
 
-1. Implement the actual payslip calculation logic
-2. Add Employee and Payslip domain entities
-3. Create comprehensive test coverage for tax calculations
-4. Build API and frontend components
+A simple HTML/CSS/JavaScript interface is served from the API's `wwwroot` folder. Access it at `http://localhost:5140` when the API is running.

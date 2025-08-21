@@ -1,23 +1,26 @@
 using SmartlyAssignment.Core.Domain.Entities;
+using SmartlyAssignment.Core.Domain.Configuration;
 
 namespace SmartlyAssignment.Core.Domain.Services;
 
 public class TaxBracketService : ITaxBracketService
 {
+    private readonly ITaxBracketConfiguration _configuration;
+
+    public TaxBracketService(ITaxBracketConfiguration configuration)
+    {
+        _configuration = configuration;
+    }
+
     public IEnumerable<TaxBracket> GetOrderedTaxBrackets()
     {
-        var brackets = new[]
-        {
-            new TaxBracket(0m, 14000m, 0.105m),
-            new TaxBracket(14000m, 48000m, 0.175m),
-            new TaxBracket(48000m, 70000m, 0.30m),
-            new TaxBracket(70000m, 180000m, 0.33m),
-            new TaxBracket(180000m, decimal.MaxValue, 0.39m)
-        };
+        var brackets = _configuration.Brackets
+            .Select(b => new TaxBracket(b.LowerBound, b.UpperBound, b.Rate))
+            .OrderBy(b => b.LowerBound)
+            .ToList();
 
-        var orderedBrackets = brackets.OrderBy(b => b.LowerBound).ToList();
-        ValidateContinuousBounds(orderedBrackets);
-        return orderedBrackets;
+        ValidateContinuousBounds(brackets);
+        return brackets;
     }
 
     private void ValidateContinuousBounds(IList<TaxBracket> orderedBrackets)

@@ -1,4 +1,10 @@
 using SmartlyAssignment.Core.Domain.Services;
+using SmartlyAssignment.Core.Domain.Configuration;
+using SmartlyAssignment.Api.Configuration;
+
+// Force Development environment and port 5140 for this dev project
+Environment.SetEnvironmentVariable("ASPNETCORE_ENVIRONMENT", "Development");
+Environment.SetEnvironmentVariable("ASPNETCORE_URLS", "http://localhost:5140");
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -6,6 +12,13 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddOpenApi();
+
+// Configure tax bracket settings
+builder.Services.Configure<TaxBracketConfiguration>(
+    builder.Configuration.GetSection(TaxBracketConfiguration.SectionName));
+
+// Register configuration provider
+builder.Services.AddScoped<ITaxBracketConfiguration, TaxBracketConfigurationProvider>();
 
 // Register our domain services
 builder.Services.AddScoped<ITaxBracketService, TaxBracketService>();
