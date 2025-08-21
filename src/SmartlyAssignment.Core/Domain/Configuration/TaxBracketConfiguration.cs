@@ -1,6 +1,6 @@
 namespace SmartlyAssignment.Core.Domain.Configuration;
 
-public class TaxBracketConfiguration : ITaxBracketConfiguration
+public class TaxBracketConfiguration
 {
     public const string SectionName = "TaxBrackets";
     

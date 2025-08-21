@@ -1,15 +1,16 @@
 using SmartlyAssignment.Core.Domain.Entities;
 using SmartlyAssignment.Core.Domain.Configuration;
+using Microsoft.Extensions.Options;
 
 namespace SmartlyAssignment.Core.Domain.Services;
 
 public class TaxBracketService : ITaxBracketService
 {
-    private readonly ITaxBracketConfiguration _configuration;
+    private readonly TaxBracketConfiguration _configuration;
 
-    public TaxBracketService(ITaxBracketConfiguration configuration)
+    public TaxBracketService(IOptions<TaxBracketConfiguration> configuration)
     {
-        _configuration = configuration;
+        _configuration = configuration.Value;
     }
 
     public IEnumerable<TaxBracket> GetOrderedTaxBrackets()
